@@ -10,13 +10,15 @@ The first implementation variant is closely related to the outlined use case and
 
 For validation, two different constraint validator implementations are provided:
 
-- **Entity Validator:** very closely related to the `Entity`-type object to be validated and directly calls the getter methods
+- **Entity Validator:** very closely related to the `Entity` type object to be validated and directly calls the getter methods
 - **Reflection Validator:** validates `Object` type objects and access the fields via reflection
 
 ### @ExclusiveField
 
 The second implementation variant is similar to the Reflection Validator, but provides more flexibility, because it does not expect any particular field to be existent.
 
-Instead, the constraint annotation takes an array of field names as parameter: `@ExclusiveField(fields = { "name", "id" })`
+Instead, the constraint annotation takes an array of field names as parameter:
+
+```@ExclusiveField(fields = { "name", "id" })```
 
 Validation then uses reflection to access those fields and verifies that only one of them is actually set. Note that, both empty String values and `null` are considered as undefined.
