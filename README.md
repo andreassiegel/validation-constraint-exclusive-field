@@ -21,4 +21,10 @@ Instead, the constraint annotation takes an array of field names as parameter:
 
 ```@ExclusiveField(fields = { "name", "id" })```
 
-Validation then uses reflection to access those fields and verifies that only one of them is actually set. Note that, both empty String values and `null` are considered as undefined.
+Validation then uses reflection to access those fields and verifies that only one of them is actually set.
+
+Note that all of the following is considered as *undefined*:
+
+- `field == null`
+- `field.isEmpty()` (if `field` is instance of `String`)
+- `field.toString().isEmpty()`

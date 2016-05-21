@@ -29,7 +29,7 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
                     field.setAccessible(true);
                     Object value = field.get(object);
 
-                    if (!isNullOrEmptyString(value)) {
+                    if (!isNullOrEmpty(value)) {
                         if (fieldSet) {
                             return false;
                         } else {
@@ -50,7 +50,9 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
         return true;
     }
 
-    private boolean isNullOrEmptyString(Object object) {
-        return object == null || (object instanceof String && ((String) object).isEmpty());
+    private boolean isNullOrEmpty(Object value) {
+        return value == null
+                || (value instanceof String && ((String) value).isEmpty())
+                || value.toString().isEmpty();
     }
 }
