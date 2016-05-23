@@ -28,9 +28,8 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
 
             List<String> setFields = definedFields(object);
 
-            if (setFields.size() == 1) {
-                return true;
-            } else {
+            if (setFields.size() != 1) {
+                
                 if (setFields.isEmpty()) {
                     undefinedFieldsConstraintViolation(constraintValidatorContext);
                 } else {
