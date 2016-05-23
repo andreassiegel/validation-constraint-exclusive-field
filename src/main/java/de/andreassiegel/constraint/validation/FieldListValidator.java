@@ -31,12 +31,10 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
             if (setFields.size() == 1) {
                 return true;
             } else {
-                String message = constraintViolationMessage(setFields);
-
-                for (String fieldName : setFields) {
-                    constraintValidatorContext.buildConstraintViolationWithTemplate(message)
-                            .addPropertyNode(fieldName)
-                            .addConstraintViolation();
+                if (setFields.isEmpty()) {
+                    undefinedFieldsConstraintViolation(constraintValidatorContext);
+                } else {
+                    overspecifiedFieldsConstraintViolations(constraintValidatorContext, setFields);
                 }
 
                 return false;
@@ -46,20 +44,30 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
         return true;
     }
 
-    private String constraintViolationMessage(List<String> setFields) {
+    private void overspecifiedFieldsConstraintViolations(ConstraintValidatorContext constraintValidatorContext, List<String> setFields) {
+        String message = "only a single field of " + Arrays.toString(fields) + " may be defined";
+
+        for (String fieldName : setFields) {
+            constraintValidatorContext.buildConstraintViolationWithTemplate(message)
+                    .addPropertyNode(fieldName)
+                    .addConstraintViolation();
+        }
+    }
+
+    private void undefinedFieldsConstraintViolation(ConstraintValidatorContext constraintValidatorContext) {
         String message;
 
-        if (setFields.isEmpty()) {
-            if (fields.length > 1) {
-                message = "one of " + Arrays.toString(fields) + " may not be empty";
-            } else {
-                message = "may not be empty";
-            }
+        if (fields.length > 1) {
+            message = "one of " + Arrays.toString(fields) + " may not be empty";
         } else {
-            message = "only a single field of " + Arrays.toString(fields) + " may be defined";
+            message = "may not be empty";
         }
 
-        return message;
+        for (String fieldName : fields) {
+            constraintValidatorContext.buildConstraintViolationWithTemplate(message)
+                    .addPropertyNode(fieldName)
+                    .addConstraintViolation();
+        }
     }
 
     private List<String> definedFields(Object object) {
@@ -73,21 +81,19 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
             } catch (NoSuchFieldException e) {
                 System.out.println("The field '" + fieldName + "' declared for validation does not exist in class '" + object.getClass().getName() + "'");
                 e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                System.out.println("The field '" + fieldName + "' in class '" + object.getClass().getName() + "' is not accessible");
+                e.printStackTrace();
             }
         }
 
         return setFields;
     }
 
-    private Object getValue(Object object, String fieldName) throws NoSuchFieldException {
+    private Object getValue(Object object, String fieldName) throws NoSuchFieldException, IllegalAccessException {
         Field field = object.getClass().getDeclaredField(fieldName);
-
-        try {
-            return field.get(object);
-        } catch (IllegalAccessException e) {
-            field.setAccessible(true);
-            return getValue(object, fieldName);
-        }
+        field.setAccessible(true);
+        return field.get(object);
     }
 
     private boolean isNullOrEmpty(Object value) {
