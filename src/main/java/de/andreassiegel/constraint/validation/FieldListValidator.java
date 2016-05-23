@@ -51,9 +51,9 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
 
         if (setFields.isEmpty()) {
             if (fields.length > 1) {
-                message = "one of " + Arrays.toString(fields) + " may not be undefined";
+                message = "one of " + Arrays.toString(fields) + " may not be empty";
             } else {
-                message = fields[0] + " may not be undefined";
+                message = "may not be empty";
             }
         } else {
             message = "only a single field of " + Arrays.toString(fields) + " may be defined";
