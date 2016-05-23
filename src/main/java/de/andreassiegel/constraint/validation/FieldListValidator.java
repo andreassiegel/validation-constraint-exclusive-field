@@ -24,7 +24,7 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
 
         constraintValidatorContext.disableDefaultConstraintViolation();
 
-        if (fields.length > 1) {
+        if (fields.length > 0) {
 
             List<String> setFields = definedFields(object);
 
@@ -50,7 +50,11 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
         String message;
 
         if (setFields.isEmpty()) {
-            message = "one of " + Arrays.toString(fields) + " may not be undefined";
+            if (fields.length > 1) {
+                message = "one of " + Arrays.toString(fields) + " may not be undefined";
+            } else {
+                message = fields[0] + " may not be undefined";
+            }
         } else {
             message = "only a single field of " + Arrays.toString(fields) + " may be defined";
         }
@@ -63,22 +67,27 @@ public class FieldListValidator implements ConstraintValidator<ExclusiveField, O
 
         for (String fieldName : fields) {
             try {
-                Field field = object.getClass().getDeclaredField(fieldName);
-                field.setAccessible(true);
-                Object value = field.get(object);
-
-                if (!isNullOrEmpty(value)) {
+                if (!isNullOrEmpty(getValue(object, fieldName))) {
                     setFields.add(fieldName);
                 }
             } catch (NoSuchFieldException e) {
                 System.out.println("The field '" + fieldName + "' declared for validation does not exist in class '" + object.getClass().getName() + "'");
                 e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
             }
         }
 
         return setFields;
+    }
+
+    private Object getValue(Object object, String fieldName) throws NoSuchFieldException {
+        Field field = object.getClass().getDeclaredField(fieldName);
+
+        try {
+            return field.get(object);
+        } catch (IllegalAccessException e) {
+            field.setAccessible(true);
+            return getValue(object, fieldName);
+        }
     }
 
     private boolean isNullOrEmpty(Object value) {
