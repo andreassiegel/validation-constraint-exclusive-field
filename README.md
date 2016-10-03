@@ -1,5 +1,7 @@
 # Exclusive Field Validation Constraint
 
+[![Build Status](https://travis-ci.org/andreassiegelrfid/validation-constraint-exclusive-field.svg?branch=master)](https://travis-ci.org/andreassiegelrfid/validation-constraint-exclusive-field)
+
 This project provides two class-level annotations to be used with `javax.validation` that are capable of checking identifier fields to verify that only one of possibly alternative fields is defined.
 
 For instance, you might have an object that can either be identified by its name or by another ID, but you don't want both fields to be set in order to avoid potential conflicts that could cause problems in further processing.
